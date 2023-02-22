@@ -1,0 +1,239 @@
+def neville(x, y, xi):
+    """
+    Neville's algorithm for polynomial interpolation.
+    x: list of n data points x_i
+    y: list of n data points f(x_i)
+    xi: point to evaluate the interpolating polynomial
+    returns: interpolated value f(xi)
+    """
+    n = len(x)
+    Q = [[0] * n for i in range(n)]
+    for i in range(n):
+        Q[i][0] = y[i]
+    for i in range(1, n):
+        for j in range(1, i+1):
+            Q[i][j] = ((xi - x[i-j]) * Q[i][j-1] - 
+                       (xi - x[i]) * Q[i-1][j-1]) / (x[i] - x[i-j])
+    return Q[n-1][n-1]
+
+# Test the function with the given data
+x = [3.6, 3.8, 3.9]
+y = [1.675, 1.436, 1.318]
+xi = 3.7
+result = neville(x, y, xi)
+
+print("Interpolated value for f(3.7) using Neville's method: ", result)
+
+
+def newton_forward(x, y):
+    """
+    Newton's forward method for polynomial interpolation.
+    x: list of n data points x_i
+    y: list of n data points f(x_i)
+    returns: nested list of forward difference table
+    """
+    n = len(x)
+    F = [[0] * n for i in range(n)]
+    for i in range(n):
+        F[i][0] = y[i]
+    for j in range(1, n):
+        for i in range(n-j):
+            F[i][j] = (F[i+1][j-1] - F[i][j-1]) / (x[i+j] - x[i])
+    return F
+
+def polynomial_approximation(x, F, degree):
+    """
+    Calculate the polynomial approximation for a given degree.
+    x: list of n data points x_i
+    F: nested list of forward difference table
+    degree: degree of the polynomial approximation
+    returns: polynomial approximation function
+    """
+    def f(xi):
+        result = F[0][0]
+        prod = 1
+        for i in range(1, degree+1):
+            prod *= (xi - x[i-1])
+            result += F[0][i] * prod
+        return result
+    return f
+
+# Test the functions with the given data
+x = [7.2, 7.4, 7.5, 7.6]
+y = [23.5492, 25.3913, 26.8224, 27.4589]
+
+# Newton's forward method
+F = newton_forward(x, y)
+
+# Polynomial approximations
+f1 = polynomial_approximation(x, F, 1)
+f2 = polynomial_approximation(x, F, 2)
+f3 = polynomial_approximation(x, F, 3)
+
+# Print the polynomial approximations
+print("Polynomial approximation of degree 1:", f1.__doc__)
+print("Polynomial approximation of degree 2:", f2.__doc__)
+print("Polynomial approximation of degree 3:", f3.__doc__)
+
+
+def neville_method(x, y, xi):
+    """
+    Neville's method for polynomial interpolation.
+    x: list of n data points x_i
+    y: list of n data points f(x_i)
+    xi: x value to evaluate the interpolating polynomial
+    returns: value of the interpolating polynomial at x=xi
+    """
+    n = len(x)
+    Q = [[0] * n for i in range(n)]
+    for i in range(n):
+        Q[i][0] = y[i]
+    for j in range(1, n):
+        for i in range(n-j):
+            Q[i][j] = ((xi - x[i+j]) * Q[i][j-1] + (x[i] - xi) * Q[i+1][j-1]) / (x[i] - x[i+j])
+    return Q[0][n-1]
+
+def newton_forward(x, y):
+    """
+    Newton's forward method for polynomial interpolation.
+    x: list of n data points x_i
+    y: list of n data points f(x_i)
+    returns: nested list of forward difference table
+    """
+    n = len(x)
+    F = [[0] * n for i in range(n)]
+    for i in range(n):
+        F[i][0] = y[i]
+    for j in range(1, n):
+        for i in range(n-j):
+            F[i][j] = (F[i+1][j-1] - F[i][j-1]) / (x[i+j] - x[i])
+    return F
+
+def polynomial_approximation(x, F, degree):
+    """
+    Calculate the polynomial approximation for a given degree.
+    x: list of n data points x_i
+    F: nested list of forward difference table
+    degree: degree of the polynomial approximation
+    returns: polynomial approximation function
+    """
+    def f(xi):
+        result = F[0][0]
+        prod = 1
+        for i in range(1, degree+1):
+            prod *= (xi - x[i-1])
+            result += F[0][i] * prod
+        return result
+    return f
+
+# Test the functions with the given data
+x = [7.2, 7.4, 7.5, 7.6]
+y = [23.5492, 25.3913, 26.8224, 27.4589]
+xi = 7.3
+
+# Neville's method
+fv = neville_method(x, y, xi)
+
+# Newton's forward method
+F = newton_forward(x, y)
+f1 = polynomial_approximation(x, F, 1)
+f2 = polynomial_approximation(x, F, 2)
+f3 = polynomial_approximation(x, F, 3)
+fp1 = f1(xi)
+fp2 = f2(xi)
+fp3 = f3(xi)
+
+# Print the results
+print("Using Neville's method, the interpolating value for f(7.3) is:", fv)
+print("Using Newton's forward method, the polynomial approximations for degrees 1, 2, and 3 are:")
+print("P1(x) =", f1.__doc__)
+print("P2(x) =", f2.__doc__)
+print("P3(x) =", f3.__doc__)
+print("The values of the polynomial approximations at x=7.3 are:")
+print("P1(7.3) =", fp1)
+print("P")
+
+def divided_differences(x, fx, dfx):
+    """
+    Computes the divided differences table.
+    x: list of n data points x_i
+    fx: list of n data points f(x_i)
+    dfx: list of n data points f'(x_i)
+    returns: nested list of divided differences table
+    """
+    n = len(x)
+    table = [[0] * (2*n) for i in range(2*n)]
+    for i in range(n):
+        table[2*i][0] = x[i]
+        table[2*i+1][0] = x[i]
+        table[2*i][1] = fx[i]
+        table[2*i+1][1] = fx[i]
+        table[2*i+1][2] = dfx[i]
+    for j in range(2, 2*n):
+        for i in range(2*n-j):
+            if table[i][j] == 0:
+                table[i][j] = (table[i+1][j-1] - table[i][j-1]) / (table[i+j][0] - table[i][0])
+    return table
+
+def hermite_polynomial(table):
+    """
+    Computes the Hermite polynomial approximation matrix.
+    table: nested list of divided differences table
+    returns: nested list of Hermite polynomial approximation matrix
+    """
+    n = len(table) // 2
+    H = [[0] * (2*n) for i in range(2*n)]
+    for i in range(2*n):
+        H[i][0] = table[i][0]
+        H[i][1] = table[i][1]
+    for j in range(2, 2*n):
+        for i in range(2*n-j):
+            if H[i][j] == 0:
+                term1 = (H[i+1][j-1] - H[i][j-1]) / (H[i+j][0] - H[i][0])
+                term2 = (H[i+j][1] - 2*H[i][1]) / ((H[i+j][0] - H[i][0])**2)
+                H[i][j] = term1 - term2
+    return H
+
+# Test the functions with the given data
+x = [3.6, 3.8, 3.8]
+fx = [1.675, 1.436, 1.318]
+dfx = [-1.195, -1.188, -1.182]
+
+# Compute the Hermite polynomial approximation matrix
+table = divided_differences(x, fx, dfx)
+H = hermite_polynomial(table)
+
+# Print the Hermite polynomial approximation matrix
+print("The Hermite polynomial approximation matrix is:")
+for i in range(len(H)):
+    for j in range(len(H[i])):
+        if H[i][j] != 0:
+            if j == 0:
+                print(f"x{i//2} = {H[i][j]}", end="\t")
+            elif j == 1:
+                print(f"f(x{i//2}) = {H[i][j]}", end="\t")
+            elif i % 2 == 0:
+                print(f"f{''.join(['\'']*j)}(x{i//2}) = {H[i][j]}", end="\t")
+    print()
+
+import numpy as np
+from scipy.interpolate import CubicSpline
+
+# Define the data points
+x = np.array([2, 5, 8, 10])
+y = np.array([3, 5, 7, 9])
+
+# Compute the cubic spline coefficients
+cs = CubicSpline(x, y, bc_type="natural")
+A = cs.c
+b = np.zeros_like(A)
+b[-1] = A[-1, -2]  # Set the last element of the right-hand side vector to the second-to-last coefficient
+x = x.reshape((-1, 1))
+
+# Print the coefficients
+print("Matrix A:")
+print(A)
+print("Vector b:")
+print(b)
+print("Vector x:")
+print(x)
